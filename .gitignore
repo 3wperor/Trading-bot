@@ -1,0 +1,17 @@
+# Data & generated artifacts (rebuildable from code)
+data/
+reports/
+*.db
+*.sqlite
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Secrets — never commit API keys
+.env
+secrets.yaml

@@ -1,0 +1,45 @@
+# SmartMoney — configuration
+# All knobs live here so the strategy has few, explicit parameters
+# (fewer knobs = less room to overfit the historical replay).
+
+database:
+  path: "data/smartmoney.db"
+
+edgar:
+  # SEC requires a descriptive User-Agent with contact info. Be a good citizen.
+  user_agent: "smartmoney-research alan.strukov@gmail.com"
+  rate_limit_per_sec: 8          # SEC allows up to 10/sec; stay under
+  forms: ["13F-HR", "13F-HR/A", "4", "SC 13D", "SC 13G", "8-K"]
+
+universe:
+  # Quality over quantity. Curate strong managers; the engine also
+  # scores them by realized track record (point-in-time).
+  min_aum_usd: 100000000
+  max_managers: 60
+
+strategy:
+  # --- Signal generation ---
+  min_managers_for_confluence: 3   # how many quality whales must agree
+  new_position_weight: 1.0         # brand-new positions weigh most
+  add_position_weight: 0.5
+  hold_position_weight: 0.1
+  conviction_threshold: 1.5        # composite score needed to open a trade
+  catalyst_multiplier: 1.5         # boost when a catalyst confirms the move
+
+  # --- Portfolio / risk ---
+  starting_cash: 1000000.0
+  max_positions: 20
+  max_weight_per_position: 0.10    # 10% cap per name
+  max_holding_days: 189            # ~3 quarters
+  trailing_stop_pct: 0.20          # exit if it drops 20% off the high
+  slippage_bps: 10                 # 0.10% each way
+  commission_bps: 2
+
+replay:
+  # Backtest window (inclusive). Managers/stocks that later died are kept
+  # in the DB (survivorship-complete), so the replay sees history honestly.
+  start_date: "2015-01-01"
+  end_date: "2025-01-01"
+  # Buys fill at the first available close AFTER the filing is public
+  # (filing day + 1), never at the quarter-end price.
+  fill_lag_days: 1
